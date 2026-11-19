@@ -1,0 +1,35 @@
+name: siftmax
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - setuptools>=68
+  - wheel
+  - ninja
+  - cxx-compiler
+  - libgomp
+  # Use the defaults build backed by multithreaded MKL. The PyPI faiss-cpu
+  # wheel bundles a single-threaded generic OpenBLAS and is much slower for
+  # batched IndexFlatIP search on the dual-socket benchmark machine.
+  - defaults::faiss-cpu=1.14.1=hbca4264_0
+  - defaults::faiss=1.14.1=py311hcf75e31_0_cpu
+  - defaults::libfaiss=1.14.1=hcf21eff_0_cpu
+  - defaults::libfaiss-avx2=1.14.1=h1234567_0_cpu
+  - defaults::mkl=2025.0
+  - defaults::numpy=2.4.6=py311h4c24699_0
+  - pip:
+      # LEMUR's minimum versions also support the PLAID and
+      # SiftMax search paths. The PyPI Torch wheel includes CUDA support.
+      - torch==2.8.0
+      - pandas==3.0.1
+      - scipy==1.17.0
+      - scikit-learn==1.8.0
+      - colbert-ai==0.2.22
+      - datasets==4.7.0
+      - sentence-transformers==5.6.0
+      - transformers==4.47.1
+      - tqdm==4.67.3
+      - ujson==5.11.0
+      - pyyaml==6.0.3
+      - git+https://github.com/ejaasaari/lemur.git@776dcc13777fd7556702b7c3870b1fd2cd66eac8

@@ -1,0 +1,31 @@
+# Large generated artifacts
+indexes/
+plaid_exp/
+logs/
+embedding_files/
+results/
+results_ours/
+results_template/
+experiments/
+src/siftmax/build/
+
+# Third-party dependency is fetched by setup_siftmax.sh
+third_party/RaBitQ-Library/
+src/siftmax/RaBitQ-Library
+
+# Python and native build artifacts
+*.egg-info/
+*.so
+__pycache__/
+.pytest_cache/
+.DS_Store
+*.o
+build/
+*.save
+
+# Local files
+PROVENANCE.md
+docs/
+tests/
+
+

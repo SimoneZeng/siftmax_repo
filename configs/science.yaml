@@ -1,0 +1,41 @@
+dataset:
+  id: lotte/science
+  split: dev
+  task: search
+  queries: 538
+  documents: 343642
+embeddings:
+  checkpoint: colbert-ir/colbertv2.0
+  dimension: 128
+  query_max_vectors: 32
+  document_max_vectors: 256
+dense_retrieval:
+  model: sentence-transformers/all-MiniLM-L6-v2
+  dimension: 384
+  index: Faiss IndexFlatIP
+  normalize: true
+evaluation:
+  top_k: 10
+  cpu_threads: 32
+  serial_queries: true
+  candidate_counts: [200, 500, 1000, 1500, 2000, 3000, 4000]
+plaid:
+  residual_bits: 4
+  kmeans_iterations: 4
+  tune_ncells: [1, 2, 3, 4, 5, 6, 7, 8]
+  other_search_parameters: official_defaults
+siftmax:
+  residual_bits: 4
+  centroid_objective: iso_squared
+  alpha: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+  seed: 42
+lemur:
+  learned_dimension: 2048
+  dtype: float32
+  candidate_counts: [200, 500, 1000, 1500, 2000, 3000, 4000]
+  dr_filter_sizes: [64, 128, 256, 512, 1024]
+  epochs: 10
+  train_subset_size: 8192
+  learn_subset_size: 100000
+  ols_sample_size: 16384
+  device: cuda:0
