@@ -90,13 +90,57 @@ conda activate siftmax
 # MaxSim top-10 reference use the selected GPU. Persisted tensors/indexes
 # remain CPU-backed for timed retrieval.
 CUDA_VISIBLE_DEVICES=0 bash scripts/generate_embeddings_gpu.sh
+```
 
+#### Download the prebuilt SiftMax centroid cache (recommended)
+
+After generating the embeddings, download the prebuilt cache from the
+[`v0.1.0` release](https://github.com/SimoneZeng/siftmax_repo/releases/tag/v0.1.0)
+before starting the PLAID and exact-MaxSim experiments. The cache
+contains the 16,384 base centroids, assignments for 51,727,492 document
+tokens, and the refined `iso_squared` centroids used by the default SiftMax
+configuration.
+
+From the repository root, download both release assets, verify the archive,
+and extract it under `indexes/`:
+
+```bash
+mkdir -p indexes
+
+curl -fL --retry 3 \
+  https://github.com/SimoneZeng/siftmax_repo/releases/download/v0.1.0/siftmax_lotte_science_b4_iso_squared_build_cache.tar.zst \
+  -o indexes/siftmax_lotte_science_b4_iso_squared_build_cache.tar.zst
+
+curl -fL --retry 3 \
+  https://github.com/SimoneZeng/siftmax_repo/releases/download/v0.1.0/siftmax_lotte_science_b4_iso_squared_build_cache.tar.zst.sha256 \
+  -o indexes/siftmax_lotte_science_b4_iso_squared_build_cache.tar.zst.sha256
+
+(
+  cd indexes
+  sha256sum --check siftmax_lotte_science_b4_iso_squared_build_cache.tar.zst.sha256
+  tar --zstd -xf siftmax_lotte_science_b4_iso_squared_build_cache.tar.zst
+)
+```
+
+Once the archive is extracted, SiftMax can run immediately; native PLAID,
+DR + PLAID, and DR + exact MaxSim do not need to run first:
+
+```bash
+bash scripts/setup_siftmax.sh
+bash scripts/run_dr_siftmax.sh
+```
+
+The complete cache skips the time-consuming centroid clustering and assignment steps. SiftMax should report
+`Loaded centroid artifact` when the cache is found. The runner still constructs
+the RaBitQ packed data from the embeddings in memory; the release
+cache does not contain the complete RaBitQ index.
+
+Run the remainin baseline experiments separately when their results are needed:
+
+```bash
 bash scripts/run_plaid_native.sh
 bash scripts/run_dr_plaid.sh
 bash scripts/run_dr_exact_maxsim.sh
-
-bash scripts/setup_siftmax.sh
-bash scripts/run_dr_siftmax.sh
 
 bash scripts/run_lemur_native.sh
 bash scripts/run_dr_lemur.sh
@@ -117,7 +161,13 @@ remain CPU-only. Native PLAID's official indexer performs its own internal
 document encoding and cannot consume the shared padded ColBERT tensor cache;
 therefore that end-to-end native PLAID index build remains entirely on CPU.
 
-Native PLAID must run before DR + PLAID. SiftMax does not depend on PLAID index files: it computes its centroid count from the number of document token vectors and trains its own centroids. Native LEMUR must build (or load) its learned checkpoint before DR + LEMUR. The dense index is physically built once under `embedding_files/lotte_science/` and reused by all four DR pipelines.
+Native PLAID must run before DR + PLAID. With the complete release cache,
+SiftMax loads its centroids and token assignments without reading the PLAID
+index. If the cache is absent, it uses the configured PLAID index when
+available and otherwise falls back to data K-means. Native LEMUR must build
+(or load) its learned checkpoint before DR + LEMUR. The dense index is
+physically built once under `embedding_files/lotte_science/` and reused by all
+four DR pipelines.
 
 ## RaBitQ-Library dependency
 
