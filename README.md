@@ -164,10 +164,13 @@ therefore that end-to-end native PLAID index build remains entirely on CPU.
 Native PLAID must run before DR + PLAID. With the complete release cache,
 SiftMax loads its centroids and token assignments without reading the PLAID
 index. If the cache is absent, it uses the configured PLAID index when
-available and otherwise falls back to data K-means. Native LEMUR must build
-(or load) its learned checkpoint before DR + LEMUR. The dense index is
-physically built once under `embedding_files/lotte_science/` and reused by all
-four DR pipelines.
+available and otherwise falls back to data K-means. For other datasets that do
+not provide a centroid cache, we recommend running native PLAID first so that
+SiftMax can build its own centroids from PLAID's centroids. This is faster than
+falling back to data K-means and reduces experiment setup time. Native LEMUR
+must build (or load) its learned checkpoint before DR + LEMUR. The dense index
+is physically built once under `embedding_files/lotte_science/` and reused by
+all four DR pipelines.
 
 ## RaBitQ-Library dependency
 
